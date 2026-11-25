@@ -44,7 +44,7 @@ export class CategoriaService {
     const cantidad = await this.prisma.producto.count({
       where: { categoriaId: id },
     });
-    if (cantidad < 0) {
+    if (cantidad > 0) {
       throw new ConflictException(
         'No se puede eliminar una categoría que tiene productos',
       );
