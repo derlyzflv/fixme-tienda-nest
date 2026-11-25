@@ -1,3 +1,4 @@
+
 import {
   BadRequestException,
   Injectable,
@@ -21,25 +22,32 @@ export class PedidoService {
     const cliente = await this.prisma.cliente.findUnique({
       where: { id: data.clienteId },
     });
+
     if (!cliente || !cliente.activo) {
-      throw new NotFoundException(`El cliente ${data.clienteId} no existe`);
+      throw new NotFoundException(
+        `El cliente ${data.clienteId} no existe o está inactivo`,
+      );
     }
 
     const lineas: LineaPedido[] = [];
+
     for (const item of data.items) {
       const producto = await this.prisma.producto.findUnique({
         where: { id: item.productoId },
       });
+
       if (!producto) {
         throw new NotFoundException(
           `El producto ${item.productoId} no existe`,
         );
       }
-      if (producto.stock > item.cantidad) {
+
+      if (producto.stock < item.cantidad) {
         throw new BadRequestException(
           `Stock insuficiente para ${producto.nombre}`,
         );
       }
+
       lineas.push({
         productoId: producto.id,
         cantidad: item.cantidad,
@@ -54,14 +62,17 @@ export class PedidoService {
       for (const linea of lineas) {
         await tx.producto.update({
           where: { id: linea.productoId },
-          data: { stock: { decrement: 1 } },
+          data: { stock: { decrement: linea.cantidad } },
         });
       }
+
       return tx.pedido.create({
         data: {
           clienteId: data.clienteId,
           total,
-          detalles: { create: lineas },
+          detalles: {
+            create: lineas,
+          },
         },
         include: { detalles: true },
       });
@@ -78,24 +89,30 @@ export class PedidoService {
   findByCliente(clienteId: number) {
     return this.prisma.pedido.findMany({
       where: { clienteId },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: 'desc' },
       include: { detalles: true },
     });
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
     const pedido = await this.prisma.pedido.findUnique({
       where: { id },
-      include: { cliente: true, detalles: { include: { producto: true } } },
+      include: {
+        cliente: true,
+        detalles: { include: { producto: true } },
+      },
     });
+
     if (!pedido) {
       throw new NotFoundException(`El pedido ${id} no existe`);
     }
+
     return pedido;
   }
 
   async cambiarEstado(id: number, nuevo: EstadoPedido) {
     const pedido = await this.findOne(id);
+
     if (!puedeCambiarEstado(pedido.estado, nuevo)) {
       throw new BadRequestException(
         `No se puede pasar de ${pedido.estado} a ${nuevo}`,
@@ -103,7 +120,7 @@ export class PedidoService {
     }
 
     return this.prisma.$transaction(async (tx) => {
-      if ((nuevo = EstadoPedido.CANCELADO)) {
+      if (nuevo === EstadoPedido.CANCELADO) {
         for (const detalle of pedido.detalles) {
           await tx.producto.update({
             where: { id: detalle.productoId },
@@ -111,6 +128,7 @@ export class PedidoService {
           });
         }
       }
+
       return tx.pedido.update({
         where: { id },
         data: { estado: nuevo },

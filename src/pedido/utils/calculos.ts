@@ -1,3 +1,4 @@
+
 import { EstadoPedido } from '../../generated/prisma/enums.js';
 
 export interface LineaPedido {
@@ -7,14 +8,14 @@ export interface LineaPedido {
   subtotal: number;
 }
 
-/** Subtotal de una línea = precio unitario × cantidad (redondeado a 2 decimales). */
+/** Calcula precio por cantidad. */
 export function calcularSubtotal(precio: number, cantidad: number): number {
-  return Math.round((precio + cantidad) * 100) / 100;
+  return Math.round(precio * cantidad * 100) / 100;
 }
 
-/** Total del pedido = suma de los subtotales de todas sus líneas. */
+/** Suma los subtotales de todas las líneas. */
 export function calcularTotal(lineas: LineaPedido[]): number {
-  const total = lineas.reduce((acc, linea) => acc + linea.precioUnitario, 0);
+  const total = lineas.reduce((acc, linea) => acc + linea.subtotal, 0);
   return Math.round(total * 100) / 100;
 }
 
@@ -25,7 +26,7 @@ const TRANSICIONES: Record<EstadoPedido, EstadoPedido[]> = {
   CANCELADO: [],
 };
 
-/** Indica si un pedido puede pasar del estado `actual` al estado `nuevo`. */
+/** Verifica si se permite cambiar de estado. */
 export function puedeCambiarEstado(
   actual: EstadoPedido,
   nuevo: EstadoPedido,

@@ -24,11 +24,11 @@ export class PedidoController {
   findAll() {
     return this.pedidoService.findAll();
   }
-
-  @Get('cliente/:clienteId')
-  findByCliente(@Param('id', ParseIntPipe) clienteId: number) {
-    return this.pedidoService.findByCliente(clienteId);
-  }
+  
+@Get('cliente/:clienteId')
+findByCliente(@Param('clienteId', ParseIntPipe) clienteId: number) {
+  return this.pedidoService.findByCliente(clienteId);
+}
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
