@@ -1,7 +1,7 @@
 # Errores encontrados
 
-**Nombre:**
-**Fecha:**
+**Nombre:Sara
+**Fecha:25/11/2026
 
 > Tipos válidos: `Typo` (editor en rojo) · `Sintaxis` · `Terminal` (prisma / arranque / endpoint / tests) · `Lógica`
 
@@ -59,12 +59,12 @@ Module Pedido : Oscar
 
 | # | Archivo | Línea | Tipo | ¿Qué estaba mal? | ¿Cómo lo detectaste? | ¿Cómo lo solucionaste? |
 | --- | --- | --- | --- | --- | --- | --- |
-| 0 | `src/ejemplo/ejemplo.service.ts` | 10 | Typo | _(fila de ejemplo, bórrala) se llamaba `this.prisma.usuaro` en vez de `this.prisma.usuario`_ | _VS Code lo marcó en rojo: "Property 'usuaro' does not exist"_ | _corregí el nombre del modelo_ |
-| 1 | | | | | | |
-| 2 | | | | | | |
-| 3 | | | | | | |
-| 4 | | | | | | |
-| 5 | | | | | | |
+
+| 1 |prisma/schema.prisma |20 |error de dedo |faltaba una 'u' |en la terminal |colocando la 'u' |
+| 2 |prisma/schema.prisma |53 |error de dedo |faltaba 'i' |en la terminal |colocando la 'i' |
+| 3 |prisma/schema.prisma |47 |sintaxis |faltaba relacion |en la terminal |añadiendo relacion |
+| 4 |src/categoria/dto/create-categoria.ts |4 |sintaxis |faltaba corchete |estaba en rojo |colocando corchete |
+| 5 |src/categoria/categoria.service.ts|47 |logica |un simbolo |leyendo el codigo |cambiando al simbolo correcto |
 
 <!-- Agrega todas las filas que necesites -->
 

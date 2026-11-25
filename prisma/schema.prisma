@@ -44,8 +44,7 @@ model Producto {
   createdAt   DateTime        @default(now())
   categoriaId Int
   categoria   Categoria       @relation(fields: [categoriaId], references: [id])
-  detalles    DetallePedido[]
-
+  detalles    DetallePedido []
   @@map("productos")
 }
 

@@ -11,3 +11,5 @@ export class CreateCategoriaDto {
   @IsOptional()
   @IsString()
   descripcion?: string;
+  
+  }
